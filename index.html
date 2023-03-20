@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook events</title>
+</head>
+<body>
+    <h1>Webhook Events</h1>
+    <p>Status:</p>
+    <div id="server-sent_status"></div>
+    <p>Time:</p>
+    <div id="server-sent_time"></div>
+
+    <br>
+
+    <p>Submit payment:</p> 
+
+            <input type="text" name="name" id="name" placeholder="Name">
+            <input type="number" name="email" id="amount" placeholder="Amount">
+            <input type="submit" value="Submit" id="submit-btn">
+            
+    <script>
+        const eventSource = new EventSource('http://0d65-188-182-154-173.ngrok.io/registered/webhook');
+        const serverSentTimeDiv = document.getElementById('server-sent_time');
+        const serverSentStatusDiv = document.getElementById('server-sent_status');
+        const submitBtn = document.getElementById('submit-btn');
+        const name = document.getElementById('name');
+        const amount = document.getElementById('amount');
+
+        eventSource.addEventListener('message', (event) => {
+            serverSentTimeDiv.innerText = event.data;
+        });
+
+        eventSource.addEventListener('open', (event) => {
+            serverSentStatusDiv.innerText = 'Connection was opened';
+        });
+
+        eventSource.addEventListener('error', (event) => {
+            if (eventSource.readyState === EventSource.CLOSED) {
+                serverSentStatusDiv.innerText = 'Connection was closed';
+            } else if (eventSource.readyState === EventSource.CONNECTING) {
+                serverSentStatusDiv.innerText = 'Connection is trying to reconnect';
+            }
+        });
+
+        submitBtn.addEventListener('click', (event) => {
+            event.preventDefault()
+
+            fetch('http://0d65-188-182-154-173.ngrok.io/payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name.value,
+                    amount: amount.value
+                })
+            }).then(res => res.json()).then(data => {
+                console.log(data)
+            })
+        });
+
+    </script>    
+</body>
+</html>
