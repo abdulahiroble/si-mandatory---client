@@ -48,6 +48,7 @@
         const connectWebhook = document.getElementById('connectWebhook');
         const connectWebhookBtn = document.getElementById('connectWebhook-btn')
 
+        let url = '';
 
         // ============= GET SAVED WEBHOOK ========
         connectWebhookBtn.addEventListener('click', async () => {
@@ -68,9 +69,11 @@
 
             if (data.success) {
                 sse()
+                url = data.object.url;
             } else {
                 alert('Something went wrong connecting to webhook')
             }
+            console.log(url)
         })
 
         // ======== REGISTER WEBHOOK ========
@@ -87,9 +90,11 @@
                     name: webhookName.value
                 })
             }
-            const result = await fetch('http://localhost:8080/register/webhook', headers);
+            console.log(headers)
+            const result = await fetch(`http://localhost:8080/register/webhook`, headers);
             const data = await result.json();
             console.log(data)
+
         });
 
         // ======== SEVER SIDE EVENT FUNCTION ========
@@ -123,18 +128,24 @@
                 body: JSON.stringify({
                     name: name.value,
                     amount: amount.value,
-                    success: false
+                    success: true
                 })
             }
-            const result = await fetch('http://localhost:3000/payment/recieved', headers);
-            const data = await result.json();
-            console.log(data)
+            console.log("URL===", url)
+            if(url.length > 0){
+                const result = await fetch('http://localhost:3000/payment/recieved', headers);
+                const data = await result.json();
+                console.log(data)
 
-            if(data.recieved.success){
-                alert("Success")
+                if(data.recieved.success){
+                    alert("Success")
+                }else{
+                    alert("Payment failed. Cannot proceed")
+                }
             }else{
-                alert("Payment failed. Cannot proceed")
+                alert('missing webhook connection')
             }
+
 
         });
 
