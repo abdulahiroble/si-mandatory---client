@@ -19,9 +19,11 @@
             <input type="text" name="name" id="name" placeholder="Name">
             <input type="number" name="email" id="amount" placeholder="Amount">
             <input type="submit" value="Submit" id="submit-btn">
+
+
             
     <script>
-        const eventSource = new EventSource('https://06bb-188-182-154-173.ngrok.io/registered/webhook');
+        const eventSource = new EventSource('http://localhost:3000/registered/webhook');
         const serverSentTimeDiv = document.getElementById('server-sent_time');
         const serverSentStatusDiv = document.getElementById('server-sent_status');
         const submitBtn = document.getElementById('submit-btn');
@@ -61,7 +63,7 @@
                     success: true
                 })
             }
-            const result = await fetch('https://06bb-188-182-154-173.ngrok.io/payment/recieved', headers);
+            const result = await fetch('http://localhost:3000/payment/recieved', headers);
             const data = await result.json();
             console.log(data)
 
