@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook events</title>
+</head>
+<body>
+    <p>Saved webhook url</p>
+    <input type="text" name="webhookUrl" id="webhookUrl" placeholder="WebhookUrl">
+    <input type="text" name="webhookName" id="webhookName" placeholder="webhookName">
+    <input type="submit" value="Submit Webhook" id="submitWebhook-btn">
+
+    <p>Connect to webhook</p>
+    <input type="text" name="connectWebhook" id="connectWebhook" placeholder="connectWebhook">
+    <input type="submit" value="Connection name" id="connectWebhook-btn">
+
+
+    <h1>Webhook Events</h1>
+    <p>Status:</p>
+    <div id="server-sent_status"></div>
+    <p>Time:</p>
+    <div id="server-sent_time"></div>
+    
+    <br>
+
+    <p>Submit payment:</p> 
+
+            <input type="text" name="name" id="name" placeholder="Name">
+            <input type="number" name="email" id="amount" placeholder="Amount">
+            <input type="submit" value="Submit" id="submit-btn">
+
+            
+    <script>
+        const eventSource = new EventSource('http://localhost:3000/registered/webhook');
+        const serverSentTimeDiv = document.getElementById('server-sent_time');
+        const serverSentStatusDiv = document.getElementById('server-sent_status');
+        const submitBtn = document.getElementById('submit-btn');
+        const name = document.getElementById('name');
+        const amount = document.getElementById('amount');
+
+        const submitWebhookBtn = document.getElementById('submitWebhook-btn');
+        const webhookUrl = document.getElementById('webhookUrl');
+        const webhookName = document.getElementById('webhookName');
+        
+        const connectWebhook = document.getElementById('connectWebhook');
+        const connectWebhookBtn = document.getElementById('connectWebhook-btn')
+
+
+        connectWebhookBtn.addEventListener('click', async () => {
+            const headers = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    "Access-Control-Allow-Origin": "*",
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: connectWebhook.value
+                })
+            }
+            const result = await fetch('http://localhost:8080/get/webhook', headers);
+            const data = await result.json();
+            console.log(data)
+
+            if (data.success) {
+                sse()
+            } else {
+                alert('Something went wrong connecting to webhook')
+            }
+        })
+
+
+        submitWebhookBtn.addEventListener('click',async (event) => {
+            const headers = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    "Access-Control-Allow-Origin": "*",
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    webhookUrl: webhookUrl.value,
+                    name: webhookName.value
+                })
+            }
+            const result = await fetch('http://localhost:8080/register/webhook', headers);
+            const data = await result.json();
+            console.log(data)
+        });
+
+        const sse = () => {
+            eventSource.addEventListener('message', (event) => {
+                serverSentTimeDiv.innerText = event.data;
+                // console.log(event)
+            });
+    
+            eventSource.addEventListener('message', (event) => {
+                serverSentStatusDiv.innerText = 'Connection was opened';
+            });
+    
+            eventSource.addEventListener('error', (event) => {
+                if (eventSource.readyState === EventSource.CLOSED) {
+                    serverSentStatusDiv.innerText = 'Connection was closed';
+                } else if (eventSource.readyState === EventSource.CONNECTING) {
+                    serverSentStatusDiv.innerText = 'Connection is trying to reconnect';
+                }
+            });
+        }
+
+
+        submitBtn.addEventListener('click',async (event) => {
+            
+
+            const headers = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    "Access-Control-Allow-Origin": "*",
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name.value,
+                    amount: amount.value,
+                    success: false
+                })
+            }
+            const result = await fetch('http://localhost:3000/payment/recieved', headers);
+            const data = await result.json();
+            console.log(data)
+
+            if(data.recieved.success){
+                alert("Success")
+            }else{
+                alert("Payment failed. Cannot proceed")
+            }
+
+        });
+
+    </script>    
+</body>
+</html>

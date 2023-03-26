@@ -1,39 +1,16 @@
 import express from 'express';
+import router from './routes/router.js';
+import connectDB from './startup/mongoDB.js';
 const app = express();
 
+app.use(express.static("public"));
 app.use(express.json());
 
-// fetch('https://jsonplaceholder.typicode.com/todos/1')
-//     .then(response => response.json())
-//     .then(json => console.log(json))
+app.use(router)
 
-// const webhookUrl = 'http://b7fe-188-182-154-173.ngrok.io/registered/webhook';
+connectDB()
 
-// fetch('http://b7fe-188-182-154-173.ngrok.io/registered/webhook', {
-//     method: 'GET',
-//     headers: {
-//         'Content-Type': 'application/json'
-//     },
-//     // body: JSON.stringify({
-//     //     event: 'payment_received',
-//     //     webhook_url: webhookUrl
-//     // })
-//     // body: JSON.stringify({
-//     //     title: 'foo',
-//     //     body: 'bar',
-//     //     userId: 1,
-//     // }),
-// })
-//     .then(response => response.json())
-//     .then(data => {
-//         console.log(data);
-//     })
-//     .catch(error => {
-//         console.error('Error registering webhook:', error);
-//     });
-
-
-const PORT = 3000;
+const PORT = 8080;
 
 app.listen(PORT, () => console.log("Server is running on port", PORT));
 
