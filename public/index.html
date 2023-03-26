@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook events</title>
+    <title>Checkout</title>
 </head>
 <body>
+    <h1>Checkout</h1>
+
+
     <p>Saved webhook url</p>
     <input type="text" name="webhookUrl" id="webhookUrl" placeholder="WebhookUrl">
     <input type="text" name="webhookName" id="webhookName" placeholder="webhookName">
     <input type="submit" value="Submit Webhook" id="submitWebhook-btn">
 
     <p>Connect to webhook</p>
-    <input type="text" name="connectWebhook" id="connectWebhook" placeholder="connectWebhook">
-    <input type="submit" value="Connection name" id="connectWebhook-btn">
+    <input type="text" name="connectWebhook" id="connectWebhook" placeholder="Webhook Name">
+    <input type="submit" value="Connect" id="connectWebhook-btn">
 
-
-    <h1>Webhook Events</h1>
+    <p>Connected Webhoob status</p>
     <p>Status:</p>
     <div id="server-sent_status"></div>
     <p>Time:</p>
@@ -26,9 +28,9 @@
 
     <p>Submit payment:</p> 
 
-            <input type="text" name="name" id="name" placeholder="Name">
-            <input type="number" name="email" id="amount" placeholder="Amount">
-            <input type="submit" value="Submit" id="submit-btn">
+    <input type="text" name="name" id="name" placeholder="Name">
+    <input type="number" name="email" id="amount" placeholder="Amount">
+    <input type="submit" value="Submit" id="submit-btn">
 
             
     <script>
@@ -47,6 +49,7 @@
         const connectWebhookBtn = document.getElementById('connectWebhook-btn')
 
 
+        // ============= GET SAVED WEBHOOK ========
         connectWebhookBtn.addEventListener('click', async () => {
             const headers = {
                 method: 'POST',
@@ -70,7 +73,7 @@
             }
         })
 
-
+        // ======== REGISTER WEBHOOK ========
         submitWebhookBtn.addEventListener('click',async (event) => {
             const headers = {
                 method: 'POST',
@@ -89,10 +92,10 @@
             console.log(data)
         });
 
+        // ======== SEVER SIDE EVENT FUNCTION ========
         const sse = () => {
             eventSource.addEventListener('message', (event) => {
                 serverSentTimeDiv.innerText = event.data;
-                // console.log(event)
             });
     
             eventSource.addEventListener('message', (event) => {
@@ -108,10 +111,8 @@
             });
         }
 
-
-        submitBtn.addEventListener('click',async (event) => {
-            
-
+        // ======== SEND TRANSACTION ========
+        submitBtn.addEventListener('click',async (event) => {    
             const headers = {
                 method: 'POST',
                 headers: {

@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const WebhookSetting = mongoose.model(
     "WebhookSetting",
@@ -12,6 +12,6 @@ const WebhookSetting = mongoose.model(
             required: true
         }
     })
-)
+);
 
 export default WebhookSetting;

@@ -1,4 +1,4 @@
-import WebhookSetting from "../model/WebhookSetting.js"
+import WebhookSetting from "../model/WebhookSetting.js";
 
 class WebhookRepository {
     insertWebhook = async (body) => {
@@ -6,7 +6,7 @@ class WebhookRepository {
         const webhookSetting = new WebhookSetting({
             url: body.webhookUrl,
             name: body.name
-        })
+        });
 
         try {
             const webhookSettingSaved = await webhookSetting.save();
