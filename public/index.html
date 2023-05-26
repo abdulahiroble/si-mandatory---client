@@ -34,7 +34,8 @@
 
             
     <script>
-        const eventSource = new EventSource('http://localhost:3000/registered/webhook');
+        let url = '';
+
         const serverSentTimeDiv = document.getElementById('server-sent_time');
         const serverSentStatusDiv = document.getElementById('server-sent_status');
         const submitBtn = document.getElementById('submit-btn');
@@ -48,7 +49,6 @@
         const connectWebhook = document.getElementById('connectWebhook');
         const connectWebhookBtn = document.getElementById('connectWebhook-btn')
 
-        let url = '';
 
         // ============= GET SAVED WEBHOOK ========
         connectWebhookBtn.addEventListener('click', async () => {
@@ -65,15 +65,15 @@
             }
             const result = await fetch('http://localhost:8080/get/webhook', headers);
             const data = await result.json();
-            console.log(data)
+            console.log("DATA====",data)
 
             if (data.success) {
-                sse()
                 url = data.object.url;
+                sse(url)
             } else {
                 alert('Something went wrong connecting to webhook')
             }
-            console.log(url)
+            // console.log(url)
         })
 
         // ======== REGISTER WEBHOOK ========
@@ -90,15 +90,18 @@
                     name: webhookName.value
                 })
             }
-            console.log(headers)
+            // console.log(headers)
             const result = await fetch(`http://localhost:8080/register/webhook`, headers);
             const data = await result.json();
-            console.log(data)
+            // console.log(data)
 
         });
 
-        // ======== SEVER SIDE EVENT FUNCTION ========
-        const sse = () => {
+        // ======== SEVER SENT EVENT FUNCTION ========
+        const sse = (sseUrl) => {
+            const eventSource = new EventSource(sseUrl + '/registered/webhook');
+
+
             eventSource.addEventListener('message', (event) => {
                 serverSentTimeDiv.innerText = event.data;
             });
@@ -131,9 +134,9 @@
                     success: true
                 })
             }
-            console.log("URL===", url)
+            // console.log("URL===22222", url)
             if(url.length > 0){
-                const result = await fetch('http://localhost:3000/payment/recieved', headers);
+                const result = await fetch(url + '/payment/recieved', headers);
                 const data = await result.json();
                 console.log(data)
 
