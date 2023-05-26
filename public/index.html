@@ -14,7 +14,7 @@
     <input type="text" name="webhookName" id="webhookName" placeholder="webhookName">
     <input type="submit" value="Submit Webhook" id="submitWebhook-btn">
 
-    <p>Connect to webhook</p>
+    <p>Connect with webhook</p>
     <input type="text" name="connectWebhook" id="connectWebhook" placeholder="Webhook Name">
     <input type="submit" value="Connect" id="connectWebhook-btn">
 
@@ -32,9 +32,13 @@
     <input type="number" name="email" id="amount" placeholder="Amount">
     <input type="submit" value="Submit" id="submit-btn">
 
+    <br>
+    <input type="submit" value="Close Connection" id="close-btn">
+
             
     <script>
         let url = '';
+        let eventSource = false;
 
         const serverSentTimeDiv = document.getElementById('server-sent_time');
         const serverSentStatusDiv = document.getElementById('server-sent_status');
@@ -47,7 +51,10 @@
         const webhookName = document.getElementById('webhookName');
         
         const connectWebhook = document.getElementById('connectWebhook');
-        const connectWebhookBtn = document.getElementById('connectWebhook-btn')
+        const connectWebhookBtn = document.getElementById('connectWebhook-btn');
+
+        // CLOSE CONNECTION
+        const closeConnectionBtn = document.getElementById('close-btn');
 
 
         // ============= GET SAVED WEBHOOK ========
@@ -99,14 +106,13 @@
 
         // ======== SEVER SENT EVENT FUNCTION ========
         const sse = (sseUrl) => {
-            const eventSource = new EventSource(sseUrl + '/registered/webhook');
+            eventSource = new EventSource(sseUrl + '/registered/webhook');
+
+            console.log(eventSource);
 
 
             eventSource.addEventListener('message', (event) => {
                 serverSentTimeDiv.innerText = event.data;
-            });
-    
-            eventSource.addEventListener('message', (event) => {
                 serverSentStatusDiv.innerText = 'Connection was opened';
             });
     
@@ -118,6 +124,20 @@
                 }
             });
         }
+
+        closeConnectionBtn.addEventListener('click', (event)=>{
+            if(!eventSource){
+                alert("Service Sent Event not connected")
+            }else{
+                eventSource.close();
+                serverSentStatusDiv.innerText = 'Connection was Closed';
+                serverSentTimeDiv.innerText = "";
+                eventSource = false;
+            }
+
+
+
+        })
 
         // ======== SEND TRANSACTION ========
         submitBtn.addEventListener('click',async (event) => {    
